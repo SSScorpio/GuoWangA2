@@ -86,12 +86,14 @@ function object_animate() {
     
     // redraw each object, haven't implemented directions and bounces yet
 
-    var newx; 
-    var newy;
+    var dirx, diry, newx, newy;
     for (var i = 0; i < 10; i ++){
-        newx = objectArray[i][3] + 1;
-        newy = objectArray[i][4] + 1;
-        objectArray[i] = redraw_object(objectArray[i][0], objectArray[i][1], objectArray[i][2], newx, newy);
+        dirx = border_check(objectArray[i])[0];
+        diry = border_check(objectArray[i])[1];
+        // right now speed is divided by 2, adjust this to change object speed
+        newx = objectArray[i][3] + dirx/2;
+        newy = objectArray[i][4] + diry/2;
+        objectArray[i] = redraw_object(objectArray[i][0], dirx, diry, newx, newy);
     }
   
     // This will run animate() every 33 ms
@@ -317,14 +319,20 @@ function junk(x, y) {
 }
 
 //Changes the direction of objects if it touches the border
-function border_check(objx, objy, directx, directy){
-    if (objx - 25 <= 0 || objx + 25 >= 1000) {
-        directx = -directx;
+function border_check(obj){
+    var newdx = obj[1];
+    var newdy = obj[2];
+    //adjust border values (ie. 45 in obj[3] + 45) to fine tune border check
+    if (((obj[3]) <= 0  && obj[1] <= 0) || ((obj[3] + 45) >= 1000 && obj[1] >= 0)) {
+        newdx = -obj[1];
     }
-    if (objy - 25 <= 0 || objy + 25 >= 640) {
-        directy = -directy;
-    } 
+    if (((obj[4]) <= 40 && obj[2] <= 0) || ((obj[4] + 45) >= 640 && obj[2] >= 0)){
+        newdy = -obj[2];
+    }
+    var dir = [newdx, newdy];
+    return dir;
 }
+
 
 //Checks if an object is within range of a black/purple/blue hole
 function hole_check(objx, objy, directx, directy, holex, holey) {
@@ -350,8 +358,8 @@ function hole_check(objx, objy, directx, directy, holex, holey) {
 // used for testing, generates an object at random location
 // result: drawings with rotate and scale will produce strange results, commented out rotate and scale
 function generate_box() {
-    var directionx = Math.floor(Math.random()*10) + 1;
-    var directiony = Math.floor(Math.random()*10) + 1;
+    var directionx = Math.floor(Math.random()*10) - 5;
+    var directiony = Math.floor(Math.random()*10) - 5;
     var positionx = Math.floor(Math.random()*949) + 1;
     var positiony = Math.floor(Math.random()*549) + 40;
     satellite2(positionx, positiony);
@@ -360,8 +368,14 @@ function generate_box() {
 //Creates an object
 function generate_object() {
     var object = Math.floor(Math.random()*8);
-    var directionx = Math.floor(Math.random()*10) + 1;
-    var directiony = Math.floor(Math.random()*10) + 1;
+    var directionx = Math.floor(Math.random()*10) - 5;
+    while (directionx == 0){
+        directionx = Math.floor(Math.random()*10) - 5;
+    }
+    var directiony = Math.floor(Math.random()*10) - 5;
+    while (directiony == 0){
+        directiony = Math.floor(Math.random()*10) - 5;
+    }
     var positionx = Math.floor(Math.random()*949) + 1;
     var positiony = Math.floor(Math.random()*549) + 40;
     if (object === 0) {
