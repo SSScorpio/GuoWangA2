@@ -4,13 +4,22 @@
         <meta name="Game App" content="Description of a made up game to my knowledge"/>
         <meta charset=UTF-8>
         <link href="assets/css/style.css" type="text/css" rel="stylesheet">
-        <script type="text/javascript" src="assets/scripts/script.js" async></script>
+        <script type="text/javascript" src="assets/scripts/jquery-2.2.4.min.js" defer></script><!-- jQuery should be first -->
+        <script type="text/javascript" src="assets/scripts/script.js" defer></script>
         <title>Black hole Plunger</title>
     </head>
     
         <body>
-
-        <canvas id="main" width="1000" height="640">
+            <section id = "title" class="start">
+                Black Hole Plunger
+            </section>
+            <section id = "highscore" class="start">
+                High score:
+            </section>
+            <section id = "start" class="start">
+                <button id="startButton">Start Game</button>
+            </section>
+        <canvas id="main" width="1000" height="640" class="hidden">
             <!-- Place a warning here as a fallback for older browsers -->
         </canvas>
     

@@ -1,9 +1,8 @@
 window.onload = function() {
-    
     var c = document.getElementById("main");
     window.ctx = c.getContext("2d"); // Dealing with a global context is easier
-    
-    box(100, 100);
+    document.getElementById("start").onclick = "PlayTime";
+    //box(100, 100);
     //planet(100, 100);
     //ship(100, 100);
     //satellite(100, 100);
@@ -11,7 +10,14 @@ window.onload = function() {
     //ufo(100, 100);
     //satellite2(100, 100);
     //star(100, 100);
-    junk(100, 100);
+    //junk(100, 100);
+}
+
+function PlayTime() {
+    var objects_float = [];
+    for(var a = 0; a < 10; a = a + 1){
+        objects_float[a] = Math.floor(Math.random()*8);
+    }
 }
 
 //Draws out a box for testing purposes
@@ -242,8 +248,7 @@ function hole_check(objx, objy, directx, directy, holex, holey) {
 }
 
 //Creates an object
-function generate_object() {
-    var object = Math.floor(Math.random()*8);
+function generate_object(object) {
     var directionx = Math.floor(Math.random()*10) + 1;
     var directiony = Math.floor(Math.random()*10) + 1;
     var positionx = Math.floor(Math.random()*999) + 1;
@@ -272,6 +277,22 @@ function generate_object() {
     else if (object === 7) {
         junk(positionx, positiony);
     }
+}
+
+function create_hole(x, y) {
+    ctx.translate(x + 25, y + 25);
+    var choice = Math.floor(Math.random()*3);
+    if (choice === 0) {
+        ctx.drawImage("black hole.svg", 0, 0, 50, 50, 0, 0, 50, 50);
+    }
+    else if (choice === 1) {
+        ctx.drawImage("blue hole.svg", 0, 0, 50, 50, 0, 0, 50, 50);
+    }
+    else if (choice === 2) {
+        ctx.drawImage("purple hole.svg", 0, 0, 50, 50, 0, 0, 50, 50);
+    }
+    ctx.translate(-x - 25, - y - 25);
+    
 }
 
 //For creating objects
