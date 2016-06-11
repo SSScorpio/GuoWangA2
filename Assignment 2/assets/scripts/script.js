@@ -4,7 +4,7 @@ window.onload = function(){
     window.ctx = c.getContext("2d"); // Dealing with a global context is easier
 
 
-    //box(100, 100);
+    //box(200, 50);
     //planet(100, 100);
     //ship(100, 100);
     //satellite(100, 100);
@@ -14,7 +14,22 @@ window.onload = function(){
     //star(100, 100);
     // junk(100, 100);
 
-} 
+}
+
+// button on start page brings up canvas
+document.getElementById("startButton").onclick = function() {
+    
+    //hide start screen elements
+    var $sections = $('section');
+    $sections.addClass( 'hidden');
+
+    //show canvas
+    var $canvas = $('canvas');
+    $canvas.removeClass( 'hidden');
+
+    initiate_canvas();
+
+}
 
 
 //global variables
@@ -22,8 +37,8 @@ var count = 60;
 var timeup = false;
 var score = 200;
 var level = 1;
-var object0, object1, object2, object3, object4, object5, object6, object7, object8, object9;
-var objectArray;
+var object, object0, object1, object2, object3, object4, object5, object6, object7, object8, object9;
+var objectArray = [];
 
 
 function initiate_canvas(){
@@ -45,17 +60,21 @@ function initiate_canvas(){
 
     // initiate objects and store them in the array list
     // each object stores [object, dirx, diry, posx, posy]
-    object0 = generate_object();
-    object1 = generate_object();
-    object2 = generate_object();
-    object3 = generate_object();
-    object4 = generate_object();
-    object5 = generate_object();
-    object6 = generate_object();
-    object7 = generate_object();
-    object8 = generate_object();
-    object9 = generate_object();
-    objectArray = [object0, object1, object2, object3, object4, object5, object6, object7, object8, object9];
+    for (var i = 0; i < 10; i ++){
+        object = generate_object();
+        objectArray[i] = object;
+    }
+    //object0 = generate_object();
+    //object1 = generate_object();
+    //object2 = generate_object();
+    //object3 = generate_object();
+    //object4 = generate_object();
+    //object5 = generate_object();
+    //object6 = generate_object();
+    //object7 = generate_object();
+    //object8 = generate_object();
+    //object9 = generate_object();
+    //objectArray = [object0, object1, object2, object3, object4, object5, object6, object7, object8, object9];
 
     // clls object_animate and counter after a 2 second delay
     setTimeout(object_animate, 2000);
@@ -100,26 +119,10 @@ function object_animate() {
     setTimeout(object_animate, 33);
 }
 
-
-// button on start page brings up canvas
-document.getElementById("startButton").onclick = function() {
-    
-    //hide start screen elements
-    var $sections = $('section');
-    $sections.addClass( 'hidden');
-
-    //show canvas
-    var $canvas = $('canvas');
-    $canvas.removeClass( 'hidden');
-
-    initiate_canvas();
-
-}
-
-
 //Draws out a box for testing purposes
 function box(x, y){
     ctx.translate(x + 25, y + 25);
+    ctx.rotate(Math.PI/4);
     ctx.strokeStyle = "#000000";
     ctx.moveTo(-25, -25);
     ctx.lineTo(25, -25);
@@ -127,13 +130,14 @@ function box(x, y){
     ctx.lineTo(-25, 25);
     ctx.lineTo(-25, -25);
     ctx.stroke();
+    ctx.rotate(-Math.PI/4);
     ctx.translate(-x - 25, - y - 25);
 }
 
 //Draws a planet, Saturn
 function planet(x, y) {
     ctx.translate(x + 25, y + 25);
-    //ctx.rotate(Math.PI/8);
+    ctx.rotate(Math.PI/8);
     ctx.beginPath();
     ctx.fillStyle = "#000000";
     ctx.arc(0, 0, 16, 0, 6.28, false);
@@ -141,16 +145,18 @@ function planet(x, y) {
     ctx.stroke();
     ctx.beginPath();
     ctx.strokeStyle = "#7777ee";
-    //ctx.scale(2, 1);
+    ctx.scale(2, 1);
     ctx.arc(0, 0, 12, 0, 6.28, false);
+    ctx.scale(1/2, 1);
     ctx.stroke();
+    ctx.rotate(-Math.PI/8);
     ctx.translate(- x - 25, - y - 25);
 }
 
 //Draws a spaceship
 function ship(x, y) {
     ctx.translate(x + 25, y + 25);
-    //ctx.rotate(Math.PI/4);
+    ctx.rotate(Math.PI/4);
     ctx.fillStyle = "#585858";
     ctx.fillRect(- 10, - 10, 20, 25);
     ctx.beginPath();
@@ -172,13 +178,14 @@ function ship(x, y) {
     ctx.stroke();
     ctx.fillRect(- 7, 15, 5, 3);
     ctx.fillRect(2, 15, 5, 3);
+    ctx.rotate(-Math.PI/4);
     ctx.translate(- x - 25, - y - 25);
 }
 
 //Draws a satellite version 1
 function satellite(x, y) {
     ctx.translate(x + 25, y + 25);
-    //ctx.rotate(5*Math.PI/4);
+    ctx.rotate(5*Math.PI/4);
     ctx.fillStyle = "#000050";
     ctx.strokeStyle = "#000050";
     ctx.fillRect(-20, -10, 14, 8);
@@ -199,13 +206,14 @@ function satellite(x, y) {
     ctx.beginPath();
     ctx.arc(0, 7, 12, 0, Math.PI, false);
     ctx.stroke();
+    ctx.rotate(-5*Math.PI/4);
     ctx.translate(-x - 25, - y - 25);
 }
 
 //Draws a quarter moon, note that if background color changes, this needs to be changed
 function moon(x, y) {
     ctx.translate(x + 25, y + 25);
-    //ctx.rotate(-Math.PI/4);
+    ctx.rotate(-Math.PI/4);
     ctx.fillStyle = "#000000";
     ctx.strokeStyle = "#000000";
     ctx.beginPath();
@@ -220,6 +228,7 @@ function moon(x, y) {
     ctx.stroke();
     ctx.fillStyle = "#000000";
     ctx.fillStyle = "#000000";
+    ctx.rotate(Math.PI/4);
     ctx.translate(-x - 25, - y - 25);
 }
 
@@ -227,7 +236,7 @@ function moon(x, y) {
 function ufo(x, y){
     ctx.strokeStyle = "#000000";
     ctx.translate(x + 25, y + 25);
-    //ctx.rotate(Math.PI/8);
+    ctx.rotate(Math.PI/8);
     ctx.beginPath();
     ctx.scale(2, 1);
     ctx.arc(0, 0, 10, 0, 2*Math.PI, false);
@@ -240,11 +249,13 @@ function ufo(x, y){
     ctx.fill();
     ctx.stroke();
     ctx.beginPath();
-    //ctx.scale(2, 1);
+    ctx.scale(2, 1);
     ctx.arc(0, -6, 5, 0, Math.PI, false);
     ctx.fillStyle = "#000000";
     ctx.fill();
+    ctx.scale(1/2, 1);
     ctx.stroke();
+    ctx.rotate(-Math.PI/8);
     ctx.translate(-x - 25, - y - 25);
 }
 
@@ -253,7 +264,7 @@ function satellite2(x, y) {
     ctx.fillStyle = "#000000";
     ctx.strokeStyle = "#000000";
     ctx.translate(x + 25, y + 25);
-    //ctx.rotate(3*Math.PI/4);
+    ctx.rotate(3*Math.PI/4);
     ctx.fillRect(-20, -11, 4, 4);
     ctx.fillRect(-15, -11, 4, 4);
     ctx.fillRect(-10, -11, 4, 4);
@@ -283,13 +294,14 @@ function satellite2(x, y) {
     ctx.beginPath();
     ctx.arc(0, 17, 6, 0, Math.PI, false);
     ctx.stroke();
+    ctx.rotate(-3*Math.PI/4);
     ctx.translate(-x - 25, - y - 25);
 }
 
 //Draws a 4-pointed star
 function star(x, y) {
     ctx.translate(x + 25, y + 25);
-    //ctx.rotate(Math.PI/16);
+    ctx.rotate(Math.PI/16);
     ctx.beginPath();
     ctx.moveTo(20, 0);
     ctx.lineTo(5, 5);
@@ -302,19 +314,21 @@ function star(x, y) {
     ctx.lineTo(20, 0);
     ctx.fill();
     ctx.stroke();
+    ctx.rotate(-Math.PI/16);
     ctx.translate(-x - 25, - y - 25);
 }
 
 //Draws a refrigerator
 function junk(x, y) {
     ctx.translate(x + 25, y + 25);
-    //ctx.rotate(Math.PI/4);
+    ctx.rotate(Math.PI/4);
     ctx.fillRect(-10,-15, 20, 15);
     ctx.fillRect(-10, 1, 20, 18);
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(5, -10, 2, 5);
     ctx.fillRect(5, 5, 2, 5);
     ctx.fillStyle = "#000000";
+    ctx.rotate(-Math.PI/4);
     ctx.translate(-x - 25, - y - 25);
 }
 
@@ -440,5 +454,6 @@ function redraw_object(object, directionx, directiony, positionx, positiony){
 function base(x, y) {
     ctx.translate(x + 25, y + 25);
     //ctx.rotate(Math.PI/4);
+    //ctx.rotate(-Math.PI/4);
     ctx.translate(-x - 25, - y - 25);
 }
