@@ -3,16 +3,6 @@ window.onload = function(){
     var c = document.getElementById("main");
     window.ctx = c.getContext("2d"); // Dealing with a global context is easier
 
-
-    //box(200, 50);
-    //planet(100, 100);
-    //ship(100, 100);
-    //satellite(100, 100);
-    //moon(100, 100);
-    //ufo(100, 100);
-    //satellite2(100, 100);
-    //star(100, 100);
-    // junk(100, 100);
 }
 
 // button on start page brings up canvas
@@ -40,6 +30,28 @@ var object;
 var objectArray = [];
 var holesArray = [];
 
+function check_endgame(){
+    if(level == 1){
+        if (objectArray.length == 0){
+            gameover();
+            return true;
+        }
+        else if (timeup){
+            transition_to_level2();
+            return true;
+        }
+        return false;
+    }
+    return false;
+}
+
+function gameover(){
+    alert("gameover");
+}
+
+function transition_to_level2(){
+    alert("level 2");
+}
 
 function initiate_canvas(){
 
@@ -74,20 +86,6 @@ function initiate_canvas(){
 
 }
 
-// Counting down the timer, sets timeup to true when count is 0
-function counter(){
-
-    if (count > 0){
-        window.ctx.clearRect(850, 0, 150, 39);
-        count = count - 1;
-        ctx.fillText("Timer: " + count ,850,30);
-    }
-    else{
-        timeup = true;
-    }
-    setTimeout(counter, 1000);
-
-}
 
 // main animation
 function main_animate() {
@@ -144,8 +142,12 @@ function main_animate() {
     // update objectArray
     objectArray = newarr;
 
-    // This will run main_animate() every 33 ms
-    setTimeout(main_animate, 33);
+    if (!check_endgame()){
+        // This will run main_animate() every 33 ms if game hasn't ended
+        setTimeout(main_animate, 33);
+    }
+    
+    
 }
 
 function update_score(num){
@@ -625,8 +627,9 @@ function generate_holes() {
     // new holes and added into the array
     holesArray.push(holeInfo);
     // can change time to set hole frequency
-    setTimeout(generate_holes, 10000);
-
+    if (!check_endgame()){
+        setTimeout(generate_holes, 1500);
+    }
     return holeInfo;
 }
 
