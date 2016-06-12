@@ -13,7 +13,6 @@ window.onload = function(){
     //satellite2(100, 100);
     //star(100, 100);
     // junk(100, 100);
-
 }
 
 // button on start page brings up canvas
@@ -39,6 +38,7 @@ var score = 200;
 var level = 1;
 var object;
 var objectArray = [];
+var holesArray = [];
 
 
 function initiate_canvas(){
@@ -65,9 +65,12 @@ function initiate_canvas(){
         objectArray[i] = object;
     }
 
-    // clls object_animate and counter after a 2 second delay
-    setTimeout(object_animate, 2000);
-    setTimeout(counter, 2000);
+    // calls main_aminate and counter after a 1 second delay, generate holes after 2 seconds
+    // speed for generating holes can be adjusted at the function generate_holes
+    setTimeout(generate_holes, 2000);
+    setTimeout(main_animate, 1000);
+    setTimeout(counter, 1000);
+    
 
 }
 
@@ -86,26 +89,63 @@ function counter(){
 
 }
 
-// object animation
-function object_animate() {
+// main animation
+function main_animate() {
     
     // Always clear the canvas after drawing each frame, only clear below info bar
     window.ctx.clearRect(0, 41, 1000, 600);
-
-    var dirx, diry, newx, newy;
-    for (var i = 0; i < 10; i ++){
+    for (var i = 0; i < holesArray.length; i++) {
+        draw_holes(holesArray[i][0], holesArray[i][1], holesArray[i][2]);
+    } 
+    var dirx, diry, newx, newy, newobj, eaten, newarr = [];
+    for (var i = 0; i < objectArray.length; i ++){
+        eaten = false;
         dirx = border_check(objectArray[i])[0];
         diry = border_check(objectArray[i])[1];
         // right now speed is divided by 2, adjust this to change object speed
         newx = objectArray[i][3] + dirx;
         newy = objectArray[i][4] + diry;
-        //redraws the object
-        objectArray[i] = draw_object(objectArray[i][0], dirx, diry, newx, newy);
+        //objectArray[i] = draw_object(objectArray[i][0], dirx, diry, newx, newy);
+
+        newobj = [objectArray[i][0], dirx, diry, newx, newy];
+        // checks if the new position of the object gets eaten
+        for (var k = 0; k < holesArray.length; k++) {
+            if (eaten_check(newobj, holesArray[k])){
+                eaten = true;
+            }
+            if(!eaten){
+                dirx = hole_check(newobj, holesArray[k])[0];
+                newobj[1] = dirx;
+                diry = hole_check(newobj, holesArray[k])[1];
+                newobj[2] = diry;
+            }
+
+        }
+        //redraws the object, adds to array if object is not eaten
+        if (!eaten){
+
+            newarr.push(draw_object(objectArray[i][0], dirx, diry, newx, newy));
+        }        
     }
-  
-    // This will run animate() every 33 ms
-    setTimeout(object_animate, 33);
+    // update objectArray
+    objectArray = newarr;
+
+
+    // This will run main_animate() every 33 ms
+    setTimeout(main_animate, 33);
 }
+
+// blackhole animation
+// function blackhole_animate() {
+    
+//     // Always clear the canvas after drawing each frame, only clear below info bar
+//     //window.ctx.clearRect(0, 41, 1000, 600);
+
+//     generate_holes();
+  
+//     // This will run animate() every 2000 ms
+//     setTimeout(blackhole_animate, 2000);
+// }
 
 //Draws out a box for testing purposes
 function box(x, y){
@@ -337,34 +377,106 @@ function border_check(obj){
 
 
 //Checks if an object is within range of a black/purple/blue hole
-function hole_check(objx, objy, directx, directy, holex, holey) {
-    if (objx - 25 > holex && objx - 25 < holex && objy - 25 > holey && objy - 25 < holey) {
-        directx = (holex - objx)/25;
-        directy = (holey - objy)/25;
+// function hole_check(objx, objy, directx, directy, holex, holey) {
+//     if (objx - 25 > holex && objx - 25 < holex && objy - 25 > holey && objy - 25 < holey) {
+//         directx = (holex - objx)/25;
+//         directy = (holey - objy)/25;
+//     }
+//     else if (objx - 25 > holex && objx - 25 < holex && objy + 25 > holey && objy + 25 < holey) {
+//         directx = (holex - objx)/25;
+//         directy = (holey - objy)/25;
+//     }
+//     else if (objx + 25 > holex && objx + 25 < holex && objy - 25 > holey && objy - 25 < holey) {
+//         directx = (holex - objx)/25;
+//         directy = (holey - objy)/25;
+//     }
+//     else if (objx + 25 > holex && objx + 25 < holex && objy + 25 > holey && objy + 25 < holey) {
+//         directx = (holex - objx)/25;
+//         directy = (holey - objy)/25;
+//     }
+// }
+
+//Checks if an object is within range of a black/purple/blue hole
+// object has format [object, directionx, directiony, positionx, positiony]
+// hole has format [hole, positionx, positiony, eventhorizon_topleft, eventhorizon_topright, eventhorizon_bottomright, eventhorizon_bottomleft]
+function hole_check(object, hole) {
+    var directx = object[1];
+    var directy = object[2];
+    var eventhorizon_left, eventhorizon_right, eventhorizon_top, eventhorizon_bot;
+    var obj_left = object[3];
+    var obj_right = object[3] + 50;
+    var obj_top = object[4];
+    var obj_bot = object[4] + 50;
+    var fix = 0;
+    // if hole at the left of object
+    if (hole[1] <= object[3]){
+        eventhorizon_right = hole[4][0];
+        if (obj_left <= eventhorizon_right){
+            fix = fix + 1;
+        }
+    }else{
+        eventhorizon_left = hole[3][0];
+        if (obj_right >= eventhorizon_left){
+            fix = fix + 1;
+        }
     }
-    else if (objx - 25 > holex && objx - 25 < holex && objy + 25 > holey && objy + 25 < holey) {
-        directx = (holex - objx)/25;
-        directy = (holey - objy)/25;
+    //if hole at the top of object
+    if (hole[2] <= object[4]){
+        eventhorizon_bot = hole[5][1];
+        if (obj_top <= eventhorizon_bot){
+            fix = fix + 1;
+        }
+    }else{
+        eventhorizon_top = hole[3][1];
+        if (obj_bot >= eventhorizon_top){
+            fix = fix + 1;
+        }
     }
-    else if (objx + 25 > holex && objx + 25 < holex && objy - 25 > holey && objy - 25 < holey) {
-        directx = (holex - objx)/25;
-        directy = (holey - objy)/25;
+    if (fix == 2){
+        // adjust number in denominator to adjust speed sucked into hole
+        directx = (hole[1] - object[3])/25;
+        directy = (hole[2] - object[4])/25; 
     }
-    else if (objx + 25 > holex && objx + 25 < holex && objy + 25 > holey && objy + 25 < holey) {
-        directx = (holex - objx)/25;
-        directy = (holey - objy)/25;
-    }
+    var dirs = [directx, directy]
+    return dirs;
+
 }
 
-
-// used for testing, generates an object at random location
-// result: drawings with rotate and scale will produce strange results, commented out rotate and scale
-function generate_box() {
-    var directionx = Math.floor(Math.random()*10) - 5;
-    var directiony = Math.floor(Math.random()*10) - 5;
-    var positionx = Math.floor(Math.random()*949) + 1;
-    var positiony = Math.floor(Math.random()*549) + 40;
-    satellite2(positionx, positiony);
+// check if hole can eat object, returns true if yes
+// object has format [object, directionx, directiony, positionx, positiony]
+// hole has format [hole, positionx, positiony, eventhorizon_topleft, eventhorizon_topright, eventhorizon_bottomright, eventhorizon_bottomleft]
+function eaten_check(object, hole){
+    var hole_center_x = hole[1] + 25;
+    var hole_center_y = hole[2] + 25;
+    var obj_left = object[3];
+    var obj_right = object[3] + 50;
+    var obj_top = object[4];
+    var obj_bot = object[4] + 50;
+    var fix = 0;
+    // if hole at the left of object
+    if (hole[1] <= object[3]){
+        if (obj_left <= hole_center_x){
+            fix = fix + 1;
+        }
+    }else{
+        if (obj_right >= hole_center_x){
+            fix = fix + 1;
+        }
+    }
+    // if hole at the top of object
+    if (hole[2] <= object[4]){
+        if (obj_top <= hole_center_y){
+            fix = fix + 1;
+        }
+    }else{
+        if (obj_bot >= hole_center_y){
+            fix = fix + 1;
+        }
+    }
+    if (fix == 2){
+        return true;
+    }
+    return false;
 }
 
 //Creates an object
@@ -389,14 +501,77 @@ function generate_object() {
     return draw_object(object, directionx, directiony, positionx, positiony);;
 }
 
+// Helper function used for checking if holes overlap
+// returns 
+function check_hole_repeat(newx, newy){
+    var newleft = newx - 25;
+    var newright= newx + 75;
+    var newtop= newy - 25;
+    var newbot= newy + 75;
+    var eventhorizonleft, eventhorizonright, eventhorizontop, eventhorizonbot;
+    var fix;
+    for (var i = 0; i < holesArray.length; i++) {
+        fix = 0;
+        // if existing hole at the left
+        if (holesArray[i][1] <= newx){
+            eventhorizonright = holesArray[i][4][0];
+            if (newleft < eventhorizonright){
+                fix = fix + 1;
+            }
+        }else{
+            eventhorizonleft = holesArray[i][3][0];
+            if (newright > eventhorizonleft){
+                fix = fix + 1;
+            }
+        }
+        // if existing hole at the top
+        if (holesArray[i][2] <= newy){
+            eventhorizonbot = holesArray[i][5][1];
+            if (newtop < eventhorizonbot){
+                fix = fix + 1;
+            }
+        }else{
+            eventhorizontop = holesArray[i][3][1];
+            if (newbot > eventhorizontop){
+                fix = fix + 1;
+            }
+        }
+        if (fix == 2){
+            return true;
+        }
+    } 
+    return false;
+}
+
 //Creates blue/purple/black holes
+// 5/8 chance for blue, 2/8 for purple, 1/8 for black
 function generate_holes() {
-    var hole = Math.floor(Math.random()*3);
+    var hole = Math.floor(Math.random()*8);
     
     var positionx = Math.floor(Math.random()*959);
-    var positiony = Math.floor(Math.random()*639);
-    
-    return draw_holes(hole, positionx, positiony);
+    var positiony = Math.floor(Math.random()*560) + 40;
+    while (check_hole_repeat(positionx, positiony)){
+        positionx = Math.floor(Math.random()*959);
+        positiony = Math.floor(Math.random()*560) + 40;
+    }
+
+    // // used for testing if check_hole_repeat works
+    // var s = "";
+    // for (var i = 0; i < holesArray.length; i++) {
+    //     s = s + "left: " + holesArray[i][3][0] + " right: " +  holesArray[i][4][0] + " top: " +  holesArray[i][3][1] + " bot: " +  holesArray[i][5][1] + "\n";
+    // }
+    // alert(s);
+
+    // draw_holesreturns list with information about the hole in the format
+    // [hole, positionx, positiony, eventhorizon_topleft, eventhorizon_topright, eventhorizon_bottomright, eventhorizon_bottomleft]
+    // eventhorizon_topleft is in the format [ xposition, yposition]
+    var holeInfo = draw_holes(hole, positionx, positiony);
+    // new holes and added into the array
+    holesArray.push(holeInfo);
+    // can change time to set hole frequency
+    setTimeout(generate_holes, 10000);
+
+    return holeInfo;
 }
 
 //Creates the object based on the variable object
@@ -429,20 +604,51 @@ function draw_object(object, directionx, directiony, positionx, positiony){
     return objectInfo;
 }
 
+
+// load images outside of draw_holes function to stop flickering caused by loading every time
+// inspired by https://stackoverflow.com/questions/9522341/how-to-redraw-canvas-every-250ms-without-flickering-between-each-redraw
+var bluehole = new Image();
+var blueholeLoaded = false;
+bluehole.src = "assets/images/blue_hole.svg";
+
+bluehole.onload = function(){
+  blueholeLoaded = true;
+}
+var purplehole = new Image();
+var Loaded = false;
+purplehole.src = "assets/images/purple_hole.svg";
+
+purplehole.onload = function(){
+  purpleholeLoaded = true;
+}
+var blackhole = new Image();
+var blackholeLoaded = false;
+blackhole.src = "assets/images/black_hole.svg";
+
+blackhole.onload = function(){
+  blackholeLoaded = true;
+}
+
+
 //Draws the holes
 function draw_holes(hole, positionx, positiony) {
-    var object_hole = new Image();
-    context.drawImage(object_hole,positionx, positiony);
-    if (hole === 0) {
-        object_hole = "assets/images/blue hole.svg";
+    
+    if (hole <= 4) {
+        ctx.drawImage(bluehole , positionx, positiony);
     }
-    else if (hole === 1){
-        object_hole = "assets/images/purple hole.svg";
+    else if (hole <= 6){
+        ctx.drawImage(purplehole, positionx, positiony);
     }
-    else if (hole === 2) {
-        object_hole = "assets/images/black hole.svg";
+    else if (hole === 7) {
+        ctx.drawImage(blackhole, positionx, positiony);
     }
-    var hole_details = [hole, positionx, positiony];
+    //alert("hole: " + hole); //used to test if hole # and color on canvas matches
+    var eventhorizon_topleft = [positionx - 25, positiony - 25];
+    var eventhorizon_topright = [positionx + 75, positiony - 25];
+    var eventhorizon_bottomright = [positionx + 75, positiony + 75];
+    var eventhorizon_bottomleft = [positionx - 25, positiony + 75];
+    var hole_details = [hole, positionx, positiony, eventhorizon_topleft, eventhorizon_topright, eventhorizon_bottomright, eventhorizon_bottomleft];
+
     return hole_details;
 }
 
