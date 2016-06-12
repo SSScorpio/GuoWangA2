@@ -26,7 +26,6 @@ var count = 60;
 var timeup = false;
 var score = 200;
 var level = 1;
-var object;
 var objectArray = [];
 var holesArray = [];
 
@@ -50,6 +49,7 @@ function gameover(){
 }
 
 function transition_to_level2(){
+    level = 2;
     alert("level 2");
 }
 
@@ -72,6 +72,7 @@ function initiate_canvas(){
 
     // initiate objects and store them in the array list
     // each object stores [object, dirx, diry, posx, posy]
+    var object;
     for (var i = 0; i < 10; i ++){
         object = generate_object();
         objectArray[i] = object;
