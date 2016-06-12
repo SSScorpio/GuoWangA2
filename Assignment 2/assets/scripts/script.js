@@ -408,6 +408,19 @@ function hole_check(object, hole) {
     var obj_top = object[4];
     var obj_bot = object[4] + 50;
     var fix = 0;
+    var speed;
+    if (hole[0] <= 4) {
+        // blue hole, slowest
+        speed = 40;
+    }
+    else if (hole[0] <= 6){
+        // purple
+        speed = 25;
+    }
+    else if (hole[0] == 7) {
+        // black hole, fastest
+        speed = 10;
+    }
     // if hole at the left of object
     if (hole[1] <= object[3]){
         eventhorizon_right = hole[4][0];
@@ -434,8 +447,8 @@ function hole_check(object, hole) {
     }
     if (fix == 2){
         // adjust number in denominator to adjust speed sucked into hole
-        directx = (hole[1] - object[3])/25;
-        directy = (hole[2] - object[4])/25; 
+        directx = (hole[1] - object[3])/speed;
+        directy = (hole[2] - object[4])/speed; 
     }
     var dirs = [directx, directy]
     return dirs;
