@@ -4,17 +4,18 @@ window.onload = function(){
     window.ctx = c.getContext("2d"); // Dealing with a global context is easier
 
 }
-
+var $sections = $('section');
+var $canvas = $('canvas');
 // button on start page brings up canvas
 document.getElementById("startButton").onclick = function() {
 
     
     //hide start screen elements
-    var $sections = $('section');
+
     $sections.addClass( 'hidden');
 
     //show canvas
-    var $canvas = $('canvas');
+
     $canvas.removeClass( 'hidden');
     $canvas.css({ 'background-color': '#ffffff' });
 
@@ -30,6 +31,54 @@ var score = 200;
 var level = 1;
 var objectArray = [];
 var holesArray = [];
+var pause = false;
+rect = {
+    x: 700,
+    y: 5,
+    w: 80,
+    h: 30
+};
+
+//mouse location credits to https://miloq.blogspot.ca/2011/05/coordinates-mouse-click-canvas.html
+main.addEventListener("mousedown", getPosition, false);
+
+function getPosition(event)
+{
+  var x = event.x;
+  var y = event.y;
+
+  var c = document.getElementById("main");
+
+  x -= c.offsetLeft;
+  y -= c.offsetTop;
+
+  if (x > rect.x && x < rect.x + rect.w && y > rect.y && y < rect.y + rect.h){
+    clickpause();
+  }
+  //alert("x:" + x + " y:" + y);
+}
+
+
+function clickpause(){
+    if (pause){
+        $canvas.css({ 'background-color': '#ffffff' });
+        $canvas.css('background-image', 'none');
+        window.ctx.clearRect(700, 5, 80, 30);
+        ctx.rect( 700, 5, 80, 30); // x, y, w, h
+        ctx.stroke();
+        ctx.fillText("Pause",710,27);
+    } 
+    else {
+        $canvas.css("background-image", "url(assets/images/pausebg.png)");
+        $canvas.css("background-size", "cover");
+        window.ctx.clearRect(700, 5, 80, 30);
+        ctx.rect( 700, 5, 80, 30); // x, y, w, h
+        ctx.stroke();
+        ctx.fillText("Unpause",700,27);
+    }
+    pause = !pause;
+}
+
 
 function check_endgame(){
     if(level == 1){
@@ -62,6 +111,7 @@ function transition_to_level2(){
     }
 }
 
+
 function initiate_canvas(){
 
     //draw info bar line
@@ -74,7 +124,9 @@ function initiate_canvas(){
     ctx.font = "italic 20px Arial";
     ctx.fillText("Level " + level,10,30); // text, x, y
     ctx.fillText("Score: " + score, 400,30);
-    ctx.fillText("Pause",700,30);
+    ctx.rect( 700, 5, 80, 30); // x, y, w, h
+    ctx.stroke();
+    ctx.fillText("Pause",710,27);
     // creating a coundown, at stage start
     //need a countdown here
     ctx.fillText("Timer: " + count ,850,30);
@@ -100,64 +152,63 @@ function initiate_canvas(){
 // main animation
 function main_animate() {
     
-    // Always clear the canvas after drawing each frame, only clear below info bar
-    window.ctx.clearRect(0, 41, 1000, 600);
-    var newholearr = [];
-    for (var i = 0; i < holesArray.length; i++) {
-        //keep hole if it isnt full
-        if (!should_disappear(holesArray[i])){
-            newholearr.push(holesArray[i]);
-        }
-    }
-    holesArray = newholearr;
-    // draw remaining holes
-    for (var i = 0; i < holesArray.length; i++) {
-        draw_holes(holesArray[i][0], holesArray[i][1], holesArray[i][2]);
-    }
-
-    var dirx, diry, newx, newy, newobj, eaten, newarr = [];
-    for (var i = 0; i < objectArray.length; i ++){
-        eaten = false;
-        dirx = border_check(objectArray[i])[0];
-        diry = border_check(objectArray[i])[1];
-        // new positions of object
-        newx = objectArray[i][3] + dirx;
-        newy = objectArray[i][4] + diry;
-        //objectArray[i] = draw_object(objectArray[i][0], dirx, diry, newx, newy);
-
-        newobj = [objectArray[i][0], dirx, diry, newx, newy];
-        // checks if the new position of the object gets eaten
-        for (var k = 0; k < holesArray.length; k++) {
-            if (eaten_check(newobj, holesArray[k])){
-                eaten = true;
+    if (!check_endgame() && !pause){
+        // Always clear the canvas after drawing each frame, only clear below info bar
+        window.ctx.clearRect(0, 41, 1000, 600);
+        var newholearr = [];
+        for (var i = 0; i < holesArray.length; i++) {
+            //keep hole if it isnt full
+            if (!should_disappear(holesArray[i])){
+                newholearr.push(holesArray[i]);
             }
-            if(!eaten){
-                dirx = hole_check(newobj, holesArray[k])[0];
-                newobj[1] = dirx;
-                diry = hole_check(newobj, holesArray[k])[1];
-                newobj[2] = diry;
-            }
-
         }
-        //redraws the object, adds to array if object is not eaten
-        if (!eaten){
+        holesArray = newholearr;
+        // draw remaining holes
+        for (var i = 0; i < holesArray.length; i++) {
+            draw_holes(holesArray[i][0], holesArray[i][1], holesArray[i][2]);
+        }
 
-            newarr.push(draw_object(objectArray[i][0], dirx, diry, newx, newy));
-        }        
-    }
-    // update score if necessary
-    var diff;
-    diff = newarr.length - objectArray.length;
-    update_score(diff*50);
-    // update objectArray
-    objectArray = newarr;
+        var dirx, diry, newx, newy, newobj, eaten, newarr = [];
+        for (var i = 0; i < objectArray.length; i ++){
+            eaten = false;
+            dirx = border_check(objectArray[i])[0];
+            diry = border_check(objectArray[i])[1];
+            // new positions of object
+            newx = objectArray[i][3] + dirx;
+            newy = objectArray[i][4] + diry;
+            //objectArray[i] = draw_object(objectArray[i][0], dirx, diry, newx, newy);
 
-    if (!check_endgame()){
+            newobj = [objectArray[i][0], dirx, diry, newx, newy];
+            // checks if the new position of the object gets eaten
+            for (var k = 0; k < holesArray.length; k++) {
+                if (eaten_check(newobj, holesArray[k])){
+                    eaten = true;
+                }
+                if(!eaten){
+                    dirx = hole_check(newobj, holesArray[k])[0];
+                    newobj[1] = dirx;
+                    diry = hole_check(newobj, holesArray[k])[1];
+                    newobj[2] = diry;
+                }
+
+            }
+            //redraws the object, adds to array if object is not eaten
+            if (!eaten){
+
+                newarr.push(draw_object(objectArray[i][0], dirx, diry, newx, newy));
+            }        
+        }
+        // update score if necessary
+        var diff;
+        diff = newarr.length - objectArray.length;
+        update_score(diff*50);
+        // update objectArray
+        objectArray = newarr;
+        
+
         // This will run main_animate() every 33 ms if game hasn't ended
-        setTimeout(main_animate, 33);
     }
-    
-    
+    setTimeout(main_animate, 33);
 }
 
 function update_score(num){
@@ -168,12 +219,12 @@ function update_score(num){
 
 function counter(){
 
-    if (count > 0){
+    if (count > 0 && !check_endgame() && !pause){
         window.ctx.clearRect(850, 0, 150, 39);
         count = count - 1;
         ctx.fillText("Timer: " + count ,850,30);
     }
-    else{
+    else if (count === 0){
         timeup = true;
     }
     setTimeout(counter, 1000);
@@ -615,6 +666,7 @@ function should_disappear(hole){
 // 5/8 chance for blue, 2/8 for purple, 1/8 for black
 function generate_holes() {
     var hole = Math.floor(Math.random()*8);
+    var holeInfo;
     
     var positionx = Math.floor(Math.random()*959);
     var positiony = Math.floor(Math.random()*560) + 40;
@@ -629,17 +681,19 @@ function generate_holes() {
     //     s = s + "left: " + holesArray[i][3][0] + " right: " +  holesArray[i][4][0] + " top: " +  holesArray[i][3][1] + " bot: " +  holesArray[i][5][1] + "\n";
     // }
     // alert(s);
-
+    if (!check_endgame() && !pause){
     // draw_holesreturns list with information about the hole in the format
     // [hole, positionx, positiony, eventhorizon_topleft, eventhorizon_topright, eventhorizon_bottomright, eventhorizon_bottomleft]
     // eventhorizon_topleft is in the format [ xposition, yposition]
-    var holeInfo = draw_holes(hole, positionx, positiony);
+        holeInfo = draw_holes(hole, positionx, positiony);
     // new holes and added into the array
-    holesArray.push(holeInfo);
+        holesArray.push(holeInfo);
     // can change time to set hole frequency
-    if (!check_endgame()){
-        setTimeout(generate_holes, 1500);
+    
+        
+        
     }
+    setTimeout(generate_holes, 2000);
     return holeInfo;
 }
 
