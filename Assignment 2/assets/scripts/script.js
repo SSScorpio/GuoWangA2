@@ -60,23 +60,25 @@ function getPosition(event)
 
 
 function clickpause(){
-    if (pause){
-        $canvas.css({ 'background-color': '#ffffff' });
-        $canvas.css('background-image', 'none');
-        window.ctx.clearRect(700, 5, 80, 30);
-        ctx.rect( 700, 5, 80, 30); // x, y, w, h
-        ctx.stroke();
-        ctx.fillText("Pause",710,27);
-    } 
-    else {
-        $canvas.css("background-image", "url(assets/images/pausebg.png)");
-        $canvas.css("background-size", "cover");
-        window.ctx.clearRect(700, 5, 80, 30);
-        ctx.rect( 700, 5, 80, 30); // x, y, w, h
-        ctx.stroke();
-        ctx.fillText("Unpause",700,27);
+    if(!check_endgame()){
+        if (pause){
+            $canvas.css({ 'background-color': '#ffffff' });
+            $canvas.css('background-image', 'none');
+            window.ctx.clearRect(700, 5, 80, 30);
+            ctx.rect( 700, 5, 80, 30); // x, y, w, h
+            ctx.stroke();
+            ctx.fillText("Pause",710,27);
+        } 
+        else {
+            $canvas.css("background-image", "url(assets/images/pausebg.png)");
+            $canvas.css("background-size", "cover");
+            window.ctx.clearRect(700, 5, 80, 30);
+            ctx.rect( 700, 5, 80, 30); // x, y, w, h
+            ctx.stroke();
+            ctx.fillText("Unpause",700,27);
+        }
+        pause = !pause;
     }
-    pause = !pause;
 }
 
 
