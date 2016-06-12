@@ -44,13 +44,20 @@ function check_endgame(){
     return false;
 }
 
+var alerted_over = false;
 function gameover(){
-    alert("gameover");
+    if (!alerted_over){
+        alerted_over = true;
+        alert("gameover");
+    }
 }
 
+var alerted_nextlev = false;
 function transition_to_level2(){
-    level = 2;
-    alert("level 2");
+    if (!alerted_nextlev){
+        level = 2;
+        alert("level 2");
+    }
 }
 
 function initiate_canvas(){
