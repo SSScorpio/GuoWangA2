@@ -37,7 +37,7 @@ var count = 60;
 var timeup = false;
 var score = 200;
 var level = 1;
-var object, object0, object1, object2, object3, object4, object5, object6, object7, object8, object9;
+var object;
 var objectArray = [];
 
 
@@ -64,17 +64,6 @@ function initiate_canvas(){
         object = generate_object();
         objectArray[i] = object;
     }
-    //object0 = generate_object();
-    //object1 = generate_object();
-    //object2 = generate_object();
-    //object3 = generate_object();
-    //object4 = generate_object();
-    //object5 = generate_object();
-    //object6 = generate_object();
-    //object7 = generate_object();
-    //object8 = generate_object();
-    //object9 = generate_object();
-    //objectArray = [object0, object1, object2, object3, object4, object5, object6, object7, object8, object9];
 
     // clls object_animate and counter after a 2 second delay
     setTimeout(object_animate, 2000);
@@ -102,17 +91,16 @@ function object_animate() {
     
     // Always clear the canvas after drawing each frame, only clear below info bar
     window.ctx.clearRect(0, 41, 1000, 600);
-    
-    // redraw each object, haven't implemented directions and bounces yet
 
     var dirx, diry, newx, newy;
     for (var i = 0; i < 10; i ++){
         dirx = border_check(objectArray[i])[0];
         diry = border_check(objectArray[i])[1];
         // right now speed is divided by 2, adjust this to change object speed
-        newx = objectArray[i][3] + dirx/2;
-        newy = objectArray[i][4] + diry/2;
-        objectArray[i] = redraw_object(objectArray[i][0], dirx, diry, newx, newy);
+        newx = objectArray[i][3] + dirx;
+        newy = objectArray[i][4] + diry;
+        //redraws the object
+        objectArray[i] = draw_object(objectArray[i][0], dirx, diry, newx, newy);
     }
   
     // This will run animate() every 33 ms
@@ -381,17 +369,38 @@ function generate_box() {
 
 //Creates an object
 function generate_object() {
+    //Determines what object to create
     var object = Math.floor(Math.random()*8);
-    var directionx = Math.floor(Math.random()*10) - 5;
+    
+    //Sets a direction for the objects to use, between -3 and 3, except 0
+    var directionx = Math.ceil(Math.random()*7) - 4;
+    var directiony = Math.ceil(Math.random()*7) - 4;
     while (directionx == 0){
-        directionx = Math.floor(Math.random()*10) - 5;
+        directionx = Math.ceil(Math.random()*7) - 4;
     }
-    var directiony = Math.floor(Math.random()*10) - 5;
     while (directiony == 0){
-        directiony = Math.floor(Math.random()*10) - 5;
+        directiony = Math.ceil(Math.random()*7) - 4;
     }
+    
+    //Selects a random spot to place the object
     var positionx = Math.floor(Math.random()*949) + 1;
     var positiony = Math.floor(Math.random()*549) + 40;
+    
+    return draw_object(object, directionx, directiony, positionx, positiony);;
+}
+
+//Creates blue/purple/black holes
+function generate_holes() {
+    var hole = Math.floor(Math.random()*3);
+    
+    var positionx = Math.floor(Math.random()*959);
+    var positiony = Math.floor(Math.random()*639);
+    
+    return draw_holes(hole, positionx, positiony);
+}
+
+//Creates the object based on the variable object
+function draw_object(object, directionx, directiony, positionx, positiony){
     if (object === 0) {
         junk(positionx, positiony);
     }
@@ -420,34 +429,21 @@ function generate_object() {
     return objectInfo;
 }
 
-function redraw_object(object, directionx, directiony, positionx, positiony){
-    if (object === 0) {
-        junk(positionx, positiony);
+//Draws the holes
+function draw_holes(hole, positionx, positiony) {
+    var object_hole = new Image();
+    context.drawImage(object_hole,positionx, positiony);
+    if (hole === 0) {
+        object_hole = "assets/images/blue hole.svg";
     }
-    else if (object === 1) {
-        ship(positionx,positiony);
+    else if (hole === 1){
+        object_hole = "assets/images/purple hole.svg";
     }
-    else if (object === 2) {
-        star(positionx, positiony);     
+    else if (hole === 2) {
+        object_hole = "assets/images/black hole.svg";
     }
-    else if (object === 3) {
-        moon(positionx, positiony);
-    }
-    else if (object === 4) {
-        ufo(positionx, positiony);
-    }
-    else if (object === 5) {
-        planet(positionx, positiony);
-    }
-    else if (object === 6) {
-        satellite(positionx, positiony);
-    }
-    else if (object === 7) {
-        satellite2(positionx, positiony);
-    }
-    var objectInfo = [object, directionx, directiony, positionx, positiony];
-    return objectInfo;
-
+    var hole_details = [hole, positionx, positiony];
+    return hole_details;
 }
 
 //For creating objects
