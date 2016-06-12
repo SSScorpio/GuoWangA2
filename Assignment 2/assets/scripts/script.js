@@ -7,6 +7,7 @@ window.onload = function(){
 
 // button on start page brings up canvas
 document.getElementById("startButton").onclick = function() {
+
     
     //hide start screen elements
     var $sections = $('section');
@@ -15,6 +16,7 @@ document.getElementById("startButton").onclick = function() {
     //show canvas
     var $canvas = $('canvas');
     $canvas.removeClass( 'hidden');
+    $canvas.css({ 'background-color': '#ffffff' });
 
     initiate_canvas();
 
