@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="50px">
+<g>
+<ellipse cx="24.9612px" cy="24.186px" rx="8.3566px" ry="8.3566px" stroke="#000000" stroke-width="3" stroke-opacity="1" />
+<path fill="none" stroke-width="3" stroke="#000000" stroke-linejoin="round" d="M 17.4031 30.3488 C 16.4341 33.9406 15.4651 37.5323 13.062 39.2636 C 10.6589 40.9949 6.8217 40.8656 2.9845 40.7364" />
+<path fill="none" stroke-width="3" stroke="#000000" stroke-linejoin="round" d="M 24.7674 32.907 C 26.5568 35.9625 28.3462 39.0181 27.8682 41.5116 C 27.3902 44.0051 24.6447 45.9367 21.8992 47.8682" />
+<path fill="none" stroke-width="3" stroke="#000000" stroke-linejoin="round" d="M 32.2093 29.7287 C 35.7364 31.3307 39.2635 32.9328 41.124 35.5426 C 42.9845 38.1524 43.1783 41.77 43.3721 45.3876" />
+<path fill="none" stroke-width="3" stroke="#000000" stroke-linejoin="round" d="M 34.6899 23.6047 C 37.7648 23.2365 40.8397 22.8682 43.1395 23.8372 C 45.4393 24.8062 46.9638 27.1124 48.4884 29.4186" />
+<path fill="none" stroke-width="3" stroke="#000000" stroke-linejoin="round" d="M 31.7442 16.3953 C 33.6563 13.4367 35.5685 10.478 38.2558 9.49612 C 40.9431 8.51422 44.4057 9.50906 47.8682 10.5039" />
+<path fill="none" stroke-width="3" stroke="#000000" stroke-linejoin="round" d="M 24.0697 13.3721 C 22.5581 10.6977 21.0465 8.02325 21.4341 6.08527 C 21.8217 4.14728 24.1085 2.94574 26.3953 1.74419" />
+<path fill="none" stroke-width="3" stroke="#000000" stroke-linejoin="round" d="M 17.5581 16.2403 C 14.8837 15.0388 12.2093 13.8372 10.7364 11.7442 C 9.26354 9.65118 8.99223 6.66667 8.72093 3.68217" />
+<path fill="none" stroke-width="3" stroke="#000000" stroke-linejoin="round" d="M 13.8372 22.9845 C 11.3501 23.5853 8.86304 24.186 7.0155 23.4496 C 5.16796 22.7132 3.95995 20.6395 2.75194 18.5659" />
+</g>
+</svg>
