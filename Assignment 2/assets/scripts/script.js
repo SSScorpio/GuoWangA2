@@ -127,25 +127,36 @@ function main_animate() {
             newarr.push(draw_object(objectArray[i][0], dirx, diry, newx, newy));
         }        
     }
+    // update score if necessary
+    var diff;
+    diff = newarr.length - objectArray.length;
+    update_score(diff*50);
     // update objectArray
     objectArray = newarr;
-
 
     // This will run main_animate() every 33 ms
     setTimeout(main_animate, 33);
 }
 
-// blackhole animation
-// function blackhole_animate() {
-    
-//     // Always clear the canvas after drawing each frame, only clear below info bar
-//     //window.ctx.clearRect(0, 41, 1000, 600);
+function update_score(num){
+    score = score + num;
+    window.ctx.clearRect(400, 0, 200, 39);
+    ctx.fillText("Score: " + score, 400,30);
+}
 
-//     generate_holes();
-  
-//     // This will run animate() every 2000 ms
-//     setTimeout(blackhole_animate, 2000);
-// }
+function counter(){
+
+    if (count > 0){
+        window.ctx.clearRect(850, 0, 150, 39);
+        count = count - 1;
+        ctx.fillText("Timer: " + count ,850,30);
+    }
+    else{
+        timeup = true;
+    }
+    setTimeout(counter, 1000);
+
+}
 
 //Draws out a box for testing purposes
 function box(x, y){
