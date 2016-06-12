@@ -94,15 +94,25 @@ function main_animate() {
     
     // Always clear the canvas after drawing each frame, only clear below info bar
     window.ctx.clearRect(0, 41, 1000, 600);
+    var newholearr = [];
+    for (var i = 0; i < holesArray.length; i++) {
+        //keep hole if it isnt full
+        if (!should_disappear(holesArray[i])){
+            newholearr.push(holesArray[i]);
+        }
+    }
+    holesArray = newholearr;
+    // draw remaining holes
     for (var i = 0; i < holesArray.length; i++) {
         draw_holes(holesArray[i][0], holesArray[i][1], holesArray[i][2]);
-    } 
+    }
+
     var dirx, diry, newx, newy, newobj, eaten, newarr = [];
     for (var i = 0; i < objectArray.length; i ++){
         eaten = false;
         dirx = border_check(objectArray[i])[0];
         diry = border_check(objectArray[i])[1];
-        // right now speed is divided by 2, adjust this to change object speed
+        // new positions of object
         newx = objectArray[i][3] + dirx;
         newy = objectArray[i][4] + diry;
         //objectArray[i] = draw_object(objectArray[i][0], dirx, diry, newx, newy);
@@ -409,7 +419,7 @@ function border_check(obj){
 
 //Checks if an object is within range of a black/purple/blue hole
 // object has format [object, directionx, directiony, positionx, positiony]
-// hole has format [hole, positionx, positiony, eventhorizon_topleft, eventhorizon_topright, eventhorizon_bottomright, eventhorizon_bottomleft]
+// hole has format [hole, positionx, positiony, eventhorizon_topleft, eventhorizon_topright, eventhorizon_bottomright, eventhorizon_bottomleft, numeaten]
 function hole_check(object, hole) {
     var directx = object[1];
     var directy = object[2];
@@ -468,7 +478,7 @@ function hole_check(object, hole) {
 
 // check if hole can eat object, returns true if yes
 // object has format [object, directionx, directiony, positionx, positiony]
-// hole has format [hole, positionx, positiony, eventhorizon_topleft, eventhorizon_topright, eventhorizon_bottomright, eventhorizon_bottomleft]
+// hole has format [hole, positionx, positiony, eventhorizon_topleft, eventhorizon_topright, eventhorizon_bottomright, eventhorizon_bottomleft, numeaten]
 function eaten_check(object, hole){
     var hole_center_x = hole[1] + 25;
     var hole_center_y = hole[2] + 25;
@@ -498,6 +508,7 @@ function eaten_check(object, hole){
         }
     }
     if (fix == 2){
+        hole[7] = hole[7] + 1;
         return true;
     }
     return false;
@@ -564,6 +575,27 @@ function check_hole_repeat(newx, newy){
             return true;
         }
     } 
+    return false;
+}
+
+//returns true if the hole should disappear
+// hole has format [hole, positionx, positiony, eventhorizon_topleft, eventhorizon_topright, eventhorizon_bottomright, eventhorizon_bottomleft, numeaten]
+function should_disappear(hole){
+    if (hole[0] <= 4) {
+        if (hole[7] == 3){
+            return true;
+        }
+    }
+    else if (hole[0] <= 6){
+        if (hole[7] == 2){
+            return true;
+        }
+    }
+    else if (hole[0] === 7) {
+        if (hole[7] == 1){
+            return true;
+        }
+    }
     return false;
 }
 
@@ -671,7 +703,7 @@ function draw_holes(hole, positionx, positiony) {
     var eventhorizon_topright = [positionx + 75, positiony - 25];
     var eventhorizon_bottomright = [positionx + 75, positiony + 75];
     var eventhorizon_bottomleft = [positionx - 25, positiony + 75];
-    var hole_details = [hole, positionx, positiony, eventhorizon_topleft, eventhorizon_topright, eventhorizon_bottomright, eventhorizon_bottomleft];
+    var hole_details = [hole, positionx, positiony, eventhorizon_topleft, eventhorizon_topright, eventhorizon_bottomright, eventhorizon_bottomleft, 0];
 
     return hole_details;
 }
