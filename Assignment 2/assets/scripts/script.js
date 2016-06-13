@@ -17,10 +17,22 @@ document.getElementById("startButton").onclick = function() {
     initiate_canvas();
 }
 
+document.getElementById("nextButton").onclick = function() {
+    //hide start screen elements
+    $sections.addClass( 'hidden');
+
+    //show canvas
+    $canvas.removeClass( 'hidden');
+    $canvas.css({ 'background-color': '#ffffff' });
+
+    initiate_canvas();
+}
+
 //global variables
 var count = 60;
 var timeup = false;
 var score = 200;
+var highscore = 0;
 var level = 1;
 // object has format [object, directionx, directiony, positionx, positiony]
 var objectArray = [];
@@ -37,8 +49,7 @@ rect = {
 //mouse location credits to https://miloq.blogspot.ca/2011/05/coordinates-mouse-click-canvas.html
 main.addEventListener("mousedown", getPosition, false);
 
-function getPosition(event)
-{
+function getPosition(event){
     var x = event.x;
     var y = event.y;
     
@@ -114,7 +125,13 @@ var alerted_nextlev = false;
 function transition_to_level2(){
     if (!alerted_nextlev){
         level = 2;
-        var count = 60;
+        count = 60;
+        $canvas.addClass( 'hidden');
+
+        $sections.removeClass( 'hidden');
+        $start.addClass('hidden');
+        
+        $canvas.css({ 'background-color': '#ffffff' });
         alert("level 2");
     }
 }
