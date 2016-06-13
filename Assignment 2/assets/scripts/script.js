@@ -22,7 +22,9 @@ var count = 60;
 var timeup = false;
 var score = 200;
 var level = 1;
+// object has format [object, directionx, directiony, positionx, positiony]
 var objectArray = [];
+// hole has format [hole, positionx, positiony, eventhorizon_topleft, eventhorizon_topright, eventhorizon_bottomright, eventhorizon_bottomleft, numeaten]
 var holesArray = [];
 var pause = false;
 rect = {
@@ -37,18 +39,28 @@ main.addEventListener("mousedown", getPosition, false);
 
 function getPosition(event)
 {
-  var x = event.x;
-  var y = event.y;
-
-  var c = document.getElementById("main");
-
-  x -= c.offsetLeft;
-  y -= c.offsetTop;
-
-  if (x > rect.x && x < rect.x + rect.w && y > rect.y && y < rect.y + rect.h){
-    clickpause();
-  }
-  //alert("x:" + x + " y:" + y);
+    var x = event.x;
+    var y = event.y;
+    
+    var c = document.getElementById("main");
+    
+    x -= c.offsetLeft;
+    y -= c.offsetTop;
+    
+    if (x > rect.x && x < rect.x + rect.w && y > rect.y && y < rect.y + rect.h){
+        clickpause();
+    }
+    else{
+        for(var a = 0; a < holesArray.length; a = a + 1){
+            if (holesArray[a][1] < x && x < holesArray[a][1] + 50 && holesArray[a][2] < y && y < holesArray[a][2] + 50){
+                holesArray[a][7] = 4;
+                eaten = true;
+                should_disappear(holesArray[a]);
+            }
+        }
+    }
+    
+    //alert("x:" + x + " y:" + y);
 }
 
 
@@ -184,7 +196,6 @@ function main_animate() {
                     diry = hole_check(newobj, holesArray[k])[1];
                     newobj[2] = diry;
                 }
-
             }
             //redraws the object, adds to array if object is not eaten
             if (!eaten){
@@ -513,33 +524,25 @@ function hole_check(object, hole) {
 // object has format [object, directionx, directiony, positionx, positiony]
 // hole has format [hole, positionx, positiony, eventhorizon_topleft, eventhorizon_topright, eventhorizon_bottomright, eventhorizon_bottomleft, numeaten]
 function eaten_check(object, hole){
+    //The coordinates of the center of the hole
     var hole_center_x = hole[1] + 25;
     var hole_center_y = hole[2] + 25;
+    //The dimensions of the object
     var obj_left = object[3];
     var obj_right = object[3] + 50;
     var obj_top = object[4];
     var obj_bot = object[4] + 50;
+    //Checks if the edges of the object or within are on the center of the hole
+    //Needs to be equal to 2 to confirm
     var check_2 = 0;
+    
     // if hole at the left of object
-    if (hole[1] <= object[3]){
-        if (obj_left <= hole_center_x){
-            check_2 = check_2 + 1;
-        }
-    }
-    else{
-        if (obj_right >= hole_center_x){
-            check_2 = check_2 + 1;
-        }
+    if (obj_left <= hole_center_x && hole_center_x <= obj_right){
+        check_2 = check_2 + 1;
     }
     // if hole at the top of object
-    if (hole[2] <= object[4]){
-        if (obj_top <= hole_center_y){
-            check_2 = check_2 + 1;
-        }
-    }else{
-        if (obj_bot >= hole_center_y){
-            check_2 = check_2 + 1;
-        }
+    if (obj_top <= hole_center_y && hole_center_y <= obj_bot){
+        check_2 = check_2 + 1;
     }
     if (check_2 == 2){
         hole[7] = hole[7] + 1;
@@ -579,31 +582,28 @@ function check_hole_repeat(newx, newy){
     var newbot= newy + 75;
     var eventhorizonleft, eventhorizonright, eventhorizontop, eventhorizonbot;
     var check_2;
+    
     for (var i = 0; i < holesArray.length; i++) {
+        //Setup
+        eventhorizonleft = holesArray[i][3][0];
+        eventhorizonright = holesArray[i][4][0];
+        eventhorizontop = holesArray[i][3][1];
+        eventhorizonbot = holesArray[i][5][1];
         check_2 = 0;
+        
         // if existing hole at the left
-        if (holesArray[i][1] <= newx){
-            eventhorizonright = holesArray[i][4][0];
-            if (newleft < eventhorizonright){
-                check_2 = check_2 + 1;
-            }
-        }else{
-            eventhorizonleft = holesArray[i][3][0];
-            if (newright > eventhorizonleft){
-                check_2 = check_2 + 1;
-            }
+        if (eventhorizonleft <= newleft && newleft <= eventhorizonright){
+            check_2 = check_2 + 1;
+        }
+        else if(eventhorizonleft <= newright && newright <= eventhorizonright){
+            check_2 = check_2 + 1;
         }
         // if existing hole at the top
-        if (holesArray[i][2] <= newy){
-            eventhorizonbot = holesArray[i][5][1];
-            if (newtop < eventhorizonbot){
-                check_2 = check_2 + 1;
-            }
-        }else{
-            eventhorizontop = holesArray[i][3][1];
-            if (newbot > eventhorizontop){
-                check_2 = check_2 + 1;
-            }
+        if (eventhorizontop <= newtop && newtop <= eventhorizonbot){
+            check_2 = check_2 + 1;
+        }
+        else if(eventhorizontop <= newright && newbot <= eventhorizonbot){
+            check_2 = check_2 + 1;
         }
         if (check_2 == 2){
             return true;
@@ -614,9 +614,16 @@ function check_hole_repeat(newx, newy){
 
 //returns true if the hole should disappear
 // hole has format [hole, positionx, positiony, eventhorizon_topleft, eventhorizon_topright, eventhorizon_bottomright, eventhorizon_bottomleft, numeaten]
+//When hole[7] equals 4, users have clicked the hole
 function should_disappear(hole){
+    var point = 0;
     if (hole[0] <= 4) {
         if (hole[7] == 3){
+            return true;
+        }
+        else if (hole[7] == 4) {
+            point = 5;
+            update_score(point);
             return true;
         }
     }
@@ -624,12 +631,24 @@ function should_disappear(hole){
         if (hole[7] == 2){
             return true;
         }
+        else if (hole[7] == 4) {
+            point = 10;
+            update_score(point);
+            return true;
+        }
     }
     else if (hole[0] === 7) {
         if (hole[7] == 1){
             return true;
         }
+        else if (hole[7] == 4) {
+            point = 20;
+            update_score(point);
+            return true;
+        }
     }
+    
+    
     return false;
 }
 
@@ -652,6 +671,7 @@ function generate_holes() {
     //     s = s + "left: " + holesArray[i][3][0] + " right: " +  holesArray[i][4][0] + " top: " +  holesArray[i][3][1] + " bot: " +  holesArray[i][5][1] + "\n";
     // }
     // alert(s);
+    
     if (!check_endgame() && !pause){
     // draw_holesreturns list with information about the hole in the format
     // [hole, positionx, positiony, eventhorizon_topleft, eventhorizon_topright, eventhorizon_bottomright, eventhorizon_bottomleft]
@@ -661,8 +681,6 @@ function generate_holes() {
         holesArray.push(holeInfo);
     // can change time to set hole frequency
     
-        
-        
     }
     setTimeout(generate_holes, 2000);
     return holeInfo;
