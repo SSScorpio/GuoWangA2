@@ -55,7 +55,6 @@ function getPosition(event)
             if (holesArray[a][1] < x && x < holesArray[a][1] + 50 && holesArray[a][2] < y && y < holesArray[a][2] + 50){
                 holesArray[a][7] = 4;
                 eaten = true;
-                should_disappear(holesArray[a]);
             }
         }
     }
@@ -115,6 +114,7 @@ var alerted_nextlev = false;
 function transition_to_level2(){
     if (!alerted_nextlev){
         level = 2;
+        var count = 60;
         alert("level 2");
     }
 }
