@@ -129,7 +129,8 @@ function transition_to_level2(){
         $canvas.addClass( 'hidden');
 
         $sections.removeClass( 'hidden');
-        $start.addClass('hidden');
+        $("#start").addClass('hidden');
+        $("#next").removeclass('hidden');
         
         $canvas.css({ 'background-color': '#ffffff' });
         alert("level 2");
