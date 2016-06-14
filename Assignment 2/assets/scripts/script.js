@@ -1,31 +1,7 @@
 window.onload = function(){
     var c = document.getElementById("main");
     window.ctx = c.getContext("2d"); // Dealing with a global context is easier
-}
-
-var $sections = $('section');
-var $canvas = $('canvas');
-// button on start page brings up canvas
-document.getElementById("startButton").onclick = function() {
-    //hide start screen elements
-    $sections.addClass( 'hidden');
-
-    //show canvas
-    $canvas.removeClass( 'hidden');
-    $canvas.css({ 'background-color': '#ffffff' });
-
-    initiate_canvas();
-}
-
-document.getElementById("nextButton").onclick = function() {
-    //hide start screen elements
-    $sections.addClass( 'hidden');
-
-    //show canvas
-    $canvas.removeClass( 'hidden');
-    $canvas.css({ 'background-color': '#ffffff' });
-
-    initiate_canvas();
+    $('#highscore').append(highscore);
 }
 
 //global variables
@@ -45,6 +21,32 @@ rect = {
     w: 80,
     h: 30
 };
+var $sections = $('section');
+var $canvas = $('canvas');
+
+// button on start page brings up canvas
+document.getElementById("startButton").onclick = function() {
+    //hide start screen elements
+    $sections.addClass( 'hidden');
+
+    //show canvas
+    $canvas.removeClass( 'hidden');
+    $canvas.css({ 'background-color': '#ffffff' });
+
+    initiate_canvas();
+}
+
+document.getElementById("nextButton").onclick = function() {
+    //hide start screen elements
+    $sections.addClass( 'hidden');
+
+    //show canvas
+    $canvas.removeClass( 'hidden');
+    $canvas.css({ 'background-color': '#ffffff' });
+    
+    pause = !pause;
+    initiate_canvas();
+}
 
 //mouse location credits to https://miloq.blogspot.ca/2011/05/coordinates-mouse-click-canvas.html
 main.addEventListener("mousedown", getPosition, false);
@@ -127,11 +129,15 @@ function transition_to_level2(){
         level = 2;
         count = 60;
         $canvas.addClass( 'hidden');
+        $("#highscore").addClass("hidden");
+        $("#score").removeClass("hidden");
+        $("#score").append(score);
 
         $sections.removeClass( 'hidden');
         $("#start").addClass('hidden');
         $("#next").removeclass('hidden');
         
+        pause = !pause;
         $canvas.css({ 'background-color': '#ffffff' });
         alert("level 2");
     }
