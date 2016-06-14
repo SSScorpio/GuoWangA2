@@ -100,6 +100,7 @@ function clickpause(){
 
 //Checks whether there are objects left or the time is up
 function check_endgame(){
+    highscore = score;
     if(level == 1){
         if (objectArray.length == 0){
             gameover();
