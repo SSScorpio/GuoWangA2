@@ -1,57 +1,91 @@
 window.onload = function(){
     var c = document.getElementById("main");
     window.ctx = c.getContext("2d"); // Dealing with a global context is easier
-    $('#highscore').append(highscore);
+
+    //highscores
+    if (localStorage.getItem("score1") === null) {
+        localStorage.setItem('score1', -1000000);
+    } 
+    if (localStorage.getItem("score2") === null) {
+        localStorage.setItem('score2', -1000000);
+    } 
+    if (localStorage.getItem("score3") === null) {
+        localStorage.setItem('score3', -1000000);
+    }
+    document.getElementById("score1").innerHTML = localStorage.getItem("score1");
+    document.getElementById("score2").innerHTML = localStorage.getItem("score2");
+    document.getElementById("score3").innerHTML = localStorage.getItem("score3");
+}
+
+var $sections = $('section');
+var $canvas = $('canvas');
+// button on start page brings up canvas
+document.getElementById("startButton").onclick = function() {
+
+    if (end){
+        end = false;
+        // renew everything if user plays the game again
+        window.location.reload();
+    } else {
+        //hide start screen elements
+        $sections.addClass( 'hidden');
+
+        //show canvas
+        $canvas.removeClass( 'hidden');
+        $canvas.css({ 'background-color': '#ffffff' });
+
+        initiate_canvas(); 
+    }
+
 }
 
 //global variables
-var count;
+var played = false;
+var count = 6;
 var timeup = false;
 var score = 200;
-var highscore = 0;
 var level = 1;
 // object has format [object, directionx, directiony, positionx, positiony]
 var objectArray = [];
 // hole has format [hole, positionx, positiony, eventhorizon_topleft, eventhorizon_topright, eventhorizon_bottomright, eventhorizon_bottomleft, numeaten]
 var holesArray = [];
+var timermain = 0;
+var timerhole = 0;
+var timercount = 0;
+var timer2;
 var pause = false;
+var end = false;
+var alerted_over = false;
+var done_trans = false;
 rect = {
     x: 700,
     y: 5,
     w: 80,
     h: 30
 };
-var $sections = $('section');
-var $canvas = $('canvas');
 
-// button on start page brings up canvas
-document.getElementById("startButton").onclick = function() {
-    //hide start screen elements
-    $sections.addClass( 'hidden');
 
-    //show canvas
-    $canvas.removeClass( 'hidden');
-    $canvas.css({ 'background-color': '#ffffff' });
-
-    initiate_canvas();
-}
-
-//button to get to level 2
-document.getElementById("nextButton").onclick = function() {
-    //hide start screen elements
-    $sections.addClass( 'hidden');
-
-    //show canvas
-    $canvas.removeClass( 'hidden');
-    $canvas.css({ 'background-color': '#ffffff' });
-    
-    level2();
+function store_score(){
+    if (typeof(Storage) !== "undefined") {
+        if (score > localStorage.getItem("score1")){
+            localStorage.setItem('score1', score);
+        }
+        else if (score > localStorage.getItem("score2")){
+            localStorage.setItem('score2', score);
+        }
+        else if (score > localStorage.getItem("score3")){
+            localStorage.setItem('score3', score);
+        }
+    } else {
+        alert("browser does not support local storage, high score not stored");
+    }
 }
 
 //mouse location credits to https://miloq.blogspot.ca/2011/05/coordinates-mouse-click-canvas.html
 main.addEventListener("mousedown", getPosition, false);
 
-function getPosition(event){
+function getPosition(event)
+{
     var x = event.x;
     var y = event.y;
     
@@ -75,7 +109,7 @@ function getPosition(event){
     //alert("x:" + x + " y:" + y);
 }
 
-//If pause button pushed, execute this to pause the program
+
 function clickpause(){
     if(!check_endgame()){
         if (pause){
@@ -98,42 +132,61 @@ function clickpause(){
     }
 }
 
+
+
 //Checks whether there are objects left or the time is up
 function check_endgame(){
-    highscore = score;
     if(level == 1){
         if (objectArray.length == 0){
+            wipeclean();
             gameover();
             return true;
         }
-        else if (timeup && level === 2) {
-            highscore =score;
-            $canvas.addClass( 'hidden');
-            $sections.removeClass( 'hidden');
-            $("#score").addClass("hidden");
-            $("#highscore").removeClass("hidden");
-            $("#highscore").append(highscore);
-
-            $("#next").addClass('hidden');
-            $("#start").removeclass('hidden');
-            pause = !pause;
+        else if (timeup){
+            wipeclean();
+            transition_to_level2();
             return true;
         }
-        else if (timeup){
-            timeup = !timeup;
-            transition_to_level2();
+    } else if (done_trans){
+        if (objectArray.length == 0 || timeup){
+            store_score();
+            wipeclean();
+            gameover();
             return true;
         }
     }
     return false;
 }
 
+//deletes contents from objectArray and holesArray
+function wipeclean(){
+    objectArray = [];
+    holesArray = [];
+    count = 60;
+    timeup = false;
+    window.ctx.clearRect(0, 0, 1000, 640);
+}
+
+
 //When no objects remain, call this to declare game over to users
-var alerted_over = false;
+
 function gameover(){
     if (!alerted_over){
         alerted_over = true;
-        alert("gameover");
+        //hide start screen elements
+        var $special = $sections.filter( '.start' );
+        $special.removeClass( 'hidden');
+
+        //show canvas
+        $canvas.addClass( 'hidden');
+        var $title = $sections.filter( '#title' );
+        var $score = $sections.filter( '#highscore' );
+        var $button = $('button');
+        $title.text('Level ' + level);
+        $score.text('Score: ' + score);
+        $button.text('Finish');     
+        end = true;
+        level = 1;
     }
 }
 
@@ -141,26 +194,32 @@ function gameover(){
 var alerted_nextlev = false;
 function transition_to_level2(){
     if (!alerted_nextlev){
-        pause = !pause;
-        $canvas.addClass( 'hidden');
-        $sections.removeClass( 'hidden');
-        $("#highscore").addClass("hidden");
-        $("#score").removeClass("hidden");
-        $("#score").append(score);
+        alerted_nextlev = true;
+        //hide start screen elements
+        var $special = $sections.filter( '.start' );
+        $special.removeClass( 'hidden');
 
-        $("#start").addClass('hidden');
-        $("#next").removeclass('hidden');
-        
-        $canvas.css({ 'background-color': '#ffffff' });
-        alert("level 2");
-    }
+        //show canvas
+        $canvas.addClass( 'hidden');
+        var $title = $sections.filter( '#title' );
+        var $score = $sections.filter( '#highscore' );
+        var $button = $('button');
+        if (level == 2){
+            $button.text('Finish');
+            gameover();
+        } else {
+            $title.text('Level ' + level);
+            $score.text('Score: ' + score);
+            $button.text('Next');
+            alerted_nextlev = false;
+            level = 2;
+        }
+    } 
 }
 
 
 function initiate_canvas(){
     //draw info bar line
-    level = 1;
-    count = 60;
     ctx.beginPath();
     ctx.moveTo(0,40); // starting position; x, y
     ctx.lineTo(1000,40); // x, y
@@ -185,47 +244,28 @@ function initiate_canvas(){
         objectArray[i] = object;
     }
 
+    // setTimeout(generate_holes, 3000);
+    // setTimeout(main_animate, 2000);
+    // setTimeout(counter, 2000);
     // calls main_aminate and counter after a 1 second delay, generate holes after 2 seconds
     // speed for generating holes can be adjusted at the function generate_holes
-    setTimeout(generate_holes, 2000);
-    setTimeout(main_animate, 1000);
-    setTimeout(counter, 1000);
-}
-
-function level2(){
-    //draw info bar line
-    level = 2;
-    count = 60;
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, 1000, 640);
-    ctx.fillStyle = "#000000";
-    ctx.beginPath();
-    ctx.moveTo(0,40); // starting position; x, y
-    ctx.lineTo(1000,40); // x, y
-    ctx.stroke();
-
-    // info bar content
-    ctx.font = "italic 20px Arial";
-    ctx.fillText("Level " + level,10,30); // text, x, y
-    ctx.fillText("Score: " + score, 400,30);
-    ctx.rect( 700, 5, 80, 30); // x, y, w, h
-    ctx.stroke();
-    ctx.fillText("Pause",710,27);
-    // creating a coundown, at stage start
-    //need a countdown here
-    ctx.fillText("Timer: " + count ,850,30);
-
-    // initiate objects and store them in the array list
-    // each object stores [object, dirx, diry, posx, posy]
-    var object;
-    for (var i = 0; i < 10; i ++){
-        object = generate_object();
-        objectArray[i] = object;
+    if (level == 1){
+        setTimeout(generate_holes, 3000);
+        setTimeout(main_animate, 2000);
+        setTimeout(counter, 2000);
+    }else if (level == 2 ){
+        done_trans = true;
+        setTimeout(generate_holes, 3500);
     }
 
-    //Counter and generate black hole were called previously so not required now
-    setTimeout(main_animate, 1000);
+    // generate_holes();
+    // main_animate();
+    // counter();
+    // if (level == 2){
+    //     done_trans = true;
+    // }
 }
+
 
 // main animation
 function main_animate() {
@@ -280,9 +320,11 @@ function main_animate() {
         update_score(diff*50);
         // update objectArray to current number of objects
         objectArray = newarr;
+
     }
     // This will run main_animate() every 33 ms if game hasn't ended
-    setTimeout(main_animate, 33);
+    timermain = setTimeout(main_animate, 33);
+
 }
 
 //Updates the scores, num can be negative to indicate point deduction
@@ -302,7 +344,7 @@ function counter(){
     else if (count === 0){
         timeup = true;
     }
-    setTimeout(counter, 1000);
+    timercount = setTimeout(counter, 1000);
 
 }
 
@@ -557,11 +599,11 @@ function hole_check(object, hole) {
     
     if (hole[0] <= 4) {
         // blue hole, slowest
-        speed = 50;
+        speed = 30;
     }
     else if (hole[0] <= 6){
         // purple
-        speed = 25;
+        speed = 20;
     }
     else if (hole[0] == 7) {
         // black hole, fastest
@@ -638,8 +680,8 @@ function generate_object() {
     }
     
     //Selects a random spot to place the object
-    var positionx = Math.floor(Math.random()*949) + 1;
-    var positiony = Math.floor(Math.random()*549) + 40;
+    var positionx = Math.floor(Math.random()*939) + 25;
+    var positiony = Math.floor(Math.random()*550) + 65;
     
     return draw_object(object, directionx, directiony, positionx - 25, positiony - 25);;
 }
@@ -728,6 +770,7 @@ function should_disappear(hole){
 function generate_holes() {
     var hole = Math.floor(Math.random()*8);
     var holeInfo;
+    var time;
     
     var positionx = Math.floor(Math.random()*959);
     var positiony = Math.floor(Math.random()*560) + 40;
@@ -750,10 +793,8 @@ function generate_holes() {
         holeInfo = draw_holes(hole, positionx, positiony);
     // new holes and added into the array
         holesArray.push(holeInfo);
-    // can change time to set hole frequency
-    
     }
-    setTimeout(generate_holes, 2000);
+    timerhole = setTimeout(generate_holes, 2500);
     return holeInfo;
 }
 
