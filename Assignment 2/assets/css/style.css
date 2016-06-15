@@ -1,18 +1,19 @@
 body{
-	font-size: 30px;
-	text-align: center;
-	background-image: url("../images/bg.jpg");
-	background-size:cover
+  font-size: 30px;
+  text-align: center;
+  background-image: url("../images/bg.jpg");
+/*  background image credit to http://7-themes.com/7020155-earth-view-space.html*/
+  background-size:cover
 }
 section{
-	font-family: Rockwell, serif;
-	border-style: solid;
-	border-width: 1px;
-  	padding: 8px 10px 15px 10px;
-  	width: 30%;
-  	margin: auto;
-  	margin-top: 20px;
-  	background-color: white;
+  font-family: Rockwell, serif;
+  border-style: solid;
+  border-width: 1px;
+    padding: 8px 10px 15px 10px;
+    width: 30%;
+    margin: auto;
+    margin-top: 20px;
+    background-color: white;
 }
 
 /*button styling credit to http://www.w3schools.com/css/css3_buttons.asp*/
@@ -26,16 +27,13 @@ button {
     display: inline-block;
     font-size: 16px;
 }
-#pause{
-	font-size: 200px;
-}
 
 #title{
-	margin-top: 100px;
+  margin-top: 100px;
 }
 
 .hidden{
-	display: none;
+  display: none;
 }
 
 #main {
