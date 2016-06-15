@@ -5,7 +5,7 @@ window.onload = function(){
 }
 
 //global variables
-var count = 60;
+var count;
 var timeup = false;
 var score = 200;
 var highscore = 0;
@@ -36,6 +36,7 @@ document.getElementById("startButton").onclick = function() {
     initiate_canvas();
 }
 
+//button to get to level 2
 document.getElementById("nextButton").onclick = function() {
     //hide start screen elements
     $sections.addClass( 'hidden');
@@ -44,8 +45,7 @@ document.getElementById("nextButton").onclick = function() {
     $canvas.removeClass( 'hidden');
     $canvas.css({ 'background-color': '#ffffff' });
     
-    pause = !pause;
-    initiate_canvas();
+    level2();
 }
 
 //mouse location credits to https://miloq.blogspot.ca/2011/05/coordinates-mouse-click-canvas.html
@@ -75,7 +75,7 @@ function getPosition(event){
     //alert("x:" + x + " y:" + y);
 }
 
-
+//If pause button pushed, execute this to pause the program
 function clickpause(){
     if(!check_endgame()){
         if (pause){
@@ -106,7 +106,21 @@ function check_endgame(){
             gameover();
             return true;
         }
+        else if (timeup && level === 2) {
+            highscore =score;
+            $canvas.addClass( 'hidden');
+            $sections.removeClass( 'hidden');
+            $("#score").addClass("hidden");
+            $("#highscore").removeClass("hidden");
+            $("#highscore").append(highscore);
+
+            $("#next").addClass('hidden');
+            $("#start").removeclass('hidden');
+            pause = !pause;
+            return true;
+        }
         else if (timeup){
+            timeup = !timeup;
             transition_to_level2();
             return true;
         }
@@ -127,18 +141,16 @@ function gameover(){
 var alerted_nextlev = false;
 function transition_to_level2(){
     if (!alerted_nextlev){
-        level = 2;
-        count = 60;
+        pause = !pause;
         $canvas.addClass( 'hidden');
+        $sections.removeClass( 'hidden');
         $("#highscore").addClass("hidden");
         $("#score").removeClass("hidden");
         $("#score").append(score);
 
-        $sections.removeClass( 'hidden');
         $("#start").addClass('hidden');
         $("#next").removeclass('hidden');
         
-        pause = !pause;
         $canvas.css({ 'background-color': '#ffffff' });
         alert("level 2");
     }
@@ -147,6 +159,8 @@ function transition_to_level2(){
 
 function initiate_canvas(){
     //draw info bar line
+    level = 1;
+    count = 60;
     ctx.beginPath();
     ctx.moveTo(0,40); // starting position; x, y
     ctx.lineTo(1000,40); // x, y
@@ -176,10 +190,42 @@ function initiate_canvas(){
     setTimeout(generate_holes, 2000);
     setTimeout(main_animate, 1000);
     setTimeout(counter, 1000);
-    
-
 }
 
+function level2(){
+    //draw info bar line
+    level = 2;
+    count = 60;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, 1000, 640);
+    ctx.fillStyle = "#000000";
+    ctx.beginPath();
+    ctx.moveTo(0,40); // starting position; x, y
+    ctx.lineTo(1000,40); // x, y
+    ctx.stroke();
+
+    // info bar content
+    ctx.font = "italic 20px Arial";
+    ctx.fillText("Level " + level,10,30); // text, x, y
+    ctx.fillText("Score: " + score, 400,30);
+    ctx.rect( 700, 5, 80, 30); // x, y, w, h
+    ctx.stroke();
+    ctx.fillText("Pause",710,27);
+    // creating a coundown, at stage start
+    //need a countdown here
+    ctx.fillText("Timer: " + count ,850,30);
+
+    // initiate objects and store them in the array list
+    // each object stores [object, dirx, diry, posx, posy]
+    var object;
+    for (var i = 0; i < 10; i ++){
+        object = generate_object();
+        objectArray[i] = object;
+    }
+
+    //Counter and generate black hole were called previously so not required now
+    setTimeout(main_animate, 1000);
+}
 
 // main animation
 function main_animate() {
