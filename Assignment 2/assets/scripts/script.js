@@ -41,7 +41,7 @@ document.getElementById("startButton").onclick = function() {
 
 //global variables
 var played = false;
-var count = 6;
+var count = 60;
 var timeup = false;
 var score = 200;
 var level = 1;
